@@ -6,7 +6,7 @@
 1 b 4
 
 2 a 2
-2 b 3
+2 b 3 // Comment on a line
 
 3 a 5
 3 b 4
