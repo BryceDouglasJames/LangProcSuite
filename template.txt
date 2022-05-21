@@ -1,0 +1,10 @@
+// Represents a comment, will be ignored, as well as newlines
+
+startstate
+endstates
+
+state1 char1 statex
+state1 char2 statex
+.
+.
+.
