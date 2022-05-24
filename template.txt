@@ -1,4 +1,6 @@
 // Represents a comment, will be ignored, as well as newlines
+// ^ represents an epsilon transition
+// Use \^ to check on a ^, and \\ to check on a \
 
 startstate
 endstates

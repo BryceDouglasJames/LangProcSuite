@@ -112,7 +112,7 @@ class Nfa:
         f.close()
         nfa_table = {}
         states_list = []
-        lang_list = []
+        char_list = []
         lines_index = 0
         # First remove all newlines and blank lines
         while lines_index < len(file):
@@ -144,17 +144,22 @@ class Nfa:
         if trace:
             print(3, file, start_state, accept_states)
 
-        # Fourth, convert file to list of lists seperated by spaces
+        # Fourth, convert file to list of lists seperated by spaces, also build character list
         lines_index = 0
         while lines_index < len(file):
             file[lines_index] = file[lines_index].split(' ')
             if '' in file[lines_index]:
                 file[lines_index].remove('')
+            if file[lines_index][1] not in char_list:
+                if file[lines_index][1][0] == '\\':
+                    char_list[file[lines_index][1][1:]] = len(char_list)
+                elif file[lines_index][1] != '^':
+                    char_list[file[lines_index][1]] = len(char_list)
             lines_index += 1
         if trace:
-            print(4, file)
+            print(4, file, char_list)
 
-        # Fifth, construct the dfa_table using the parsed information in file
+        # Fifth, construct the nfa_table using the parsed information in file
         for line in file:
             if len(line) != 3:
                 print('Error on state with following structure:', line)
