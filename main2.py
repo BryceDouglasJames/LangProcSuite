@@ -96,12 +96,12 @@ class Dfa:
 
 
 class Nfa:
-    def __init__(self, start_state, accept_states, table, lang_list, states_list):
+    def __init__(self, start_state, accept_states, table, char_list, state_list):
         self.start_state = start_state
         self.accept_states = accept_states
         self.table = table
-        self.lang_list = lang_list
-        self.states_list = states_list
+        self.char_list = char_list
+        self.state_list = state_list
 
     def __str__(self):
         return 'Start State: ' + self.start_state + '\nAccept States: ' + str(self.accept_states) + '\nTable: ' + str(self.table)
@@ -110,9 +110,9 @@ class Nfa:
         with open(in_file, "r") as f:
             file = f.readlines()
         f.close()
-        nfa_table = {}
-        states_list = []
-        char_list = []
+        nfa_table = []
+        state_list = {}
+        char_list = {}
         lines_index = 0
         # First remove all newlines and blank lines
         while lines_index < len(file):
@@ -151,11 +151,10 @@ class Nfa:
             if '' in file[lines_index]:
                 file[lines_index].remove('')
             if file[lines_index][1] not in char_list:
-                if file[lines_index][1][0] == '\\':
-                    char_list[file[lines_index][1][1:]] = len(char_list)
-                elif file[lines_index][1] != '^':
+                if file[lines_index][1] != '^':
                     char_list[file[lines_index][1]] = len(char_list)
             lines_index += 1
+        char_list['^'] = len(char_list)
         if trace:
             print(4, file, char_list)
 
@@ -163,22 +162,26 @@ class Nfa:
         for line in file:
             if len(line) != 3:
                 print('Error on state with following structure:', line)
-                return Dfa('', '', '')
-            if line[0] not in nfa_table:
-                nfa_table[line[0]] = {}
-            if line[1] not in nfa_table[line[0]].keys():
-                nfa_table[line[0]][line[1]] = []
-            nfa_table[line[0]][line[1]].append(line[2])
-
-            if line[1] not in lang_list:
-                lang_list.append(line[1])
-            if line[2] not in states_list:
-                states_list.append(line[2])
-
+                return None
+            if line[0] not in state_list.keys():
+                state_list[line[0]] = len(nfa_table)
+                nfa_table.append([[] for _ in range(len(char_list))])
+                nfa_table[state_list[line[0]]
+                          ][len(char_list)-1].append(line[0])
+            if line[2] not in nfa_table[state_list[line[0]]][char_list[line[1]]]:
+                nfa_table[state_list[line[0]]
+                          ][char_list[line[1]]].append(line[2])
         if trace:
-            print(5, nfa_table, lang_list, states_list)
+            print(5, nfa_table, char_list, state_list)
 
-        return Nfa(start_state, accept_states, nfa_table, lang_list, states_list)
+        # Sixth, sort the internal lists
+        for row in nfa_table:
+            for column in row:
+                column.sort()
+        if trace:
+            print(6, nfa_table)
+
+        return Nfa(start_state, accept_states, nfa_table, char_list, state_list)
 
     def nfa_to_dfa(self):
         cur_set = ''
@@ -191,7 +194,7 @@ class Nfa:
         # print(self.table)
 
         while table_incrementer < len(conversion_table):
-            for char in self.lang_list:
+            for char in self.char_list:
                 # print(char)
                 cur_set = ''
                 converstion_states = conversion_table[table_incrementer][1].split(
@@ -234,7 +237,7 @@ class Nfa:
             mod_conv = conv[2:]
             for i in range(len(mod_conv)):
                 dfa_list.append(str(conv[0]) + ' ' +
-                                self.lang_list[i] + ' ' + str(mod_conv[i]))
+                                self.char_list[i] + ' ' + str(mod_conv[i]))
 
         # print(dfa_list)
         return Dfa.init_from_list(dfa_list)
@@ -251,15 +254,15 @@ class Nfa:
         return cur_state in self.accept_states
 
 
-dfa = Dfa.init_from_file(in_file, True)
+# dfa = Dfa.init_from_file(in_file, True)
 
 # print(dfa)
 
-print(dfa.check_string('aabbaab', True))
+# print(dfa.check_string('aabbaab', True))
 
-# nfa = Nfa.init_from_file(in_file2)
+nfa = Nfa.init_from_file(in_file2, True)
 
-# print(nfa)
+print(nfa)
 
 # dfa2 = nfa.nfa_to_dfa()
 # print(dfa2)
