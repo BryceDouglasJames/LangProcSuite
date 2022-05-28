@@ -1,13 +1,21 @@
 # Bryce James :)
+import string
 import sys
 
-Non_Terms = {}
-Terms = {}
+Productions = {}
+Terms = []
 Term_Strings = {}
 
 
-def __init__():
-    print("RUNNIN PREDICT/FOLLOW/FIRST SETS")
+class Production:
+    children = []
+
+    def __init__(self, p_strings, term):
+        self.children = p_strings
+        self.term = term
+
+    def add_child(self, p_string):
+        self.children.append(p_string)
 
 
 if len(sys.argv) == 1:
@@ -27,7 +35,7 @@ elif len(sys.argv) == 2:
         infile = open(sys.argv[1], 'r')
         source = infile.read().splitlines()
         source = [i for i in source if i]
-        print(source)
+        # print(source)
 
         # Compile regexes (Options)
         import re
@@ -72,16 +80,38 @@ elif len(sys.argv) == 2:
                     "Error parsing production " + source[start_line] + " : invalid production string.")
 
             # TODO Map each nonTerminal with the production string.
-            if not N_Term in Non_Terms:
-                Non_Terms[N_Term] = []
-                Non_Terms[N_Term].append(P_String)
+            if not N_Term in Productions:
+
+                Productions[N_Term] = []
+                Productions[N_Term].append(P_String)
             else:
-                Non_Terms[N_Term].append(P_String)
+                Productions[N_Term].append(P_String)
+
+            for c in P_String:
+                if c.islower():
+                    if c not in Terms:
+                        Terms.append(c)
 
             print(N_Term + " :::: " + P_String)
             start_line += 1
 
-        print(str(Non_Terms))
+        # MAKE FOLLOW SET... this ugly
+        FOLLOW = {}
+        for i in Productions:
+            for p in i:
+                FOLLOW[p] = []
+        print(FOLLOW)
+
+        for nt, s_arr in Productions.items():
+            for s in s_arr:
+                if s.strip() == "LAMB":
+                    FOLLOW[nt].append("LAMB")
+                for c in s:
+                    if c.islower():
+                        FOLLOW[nt].append(c)
+
+        print(FOLLOW)
+        print(str(Productions))
         pass
     else:
         raise RuntimeError(
