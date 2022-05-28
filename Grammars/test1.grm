@@ -1,0 +1,15 @@
+//simple grammar ab*
+
+1. A -> aB#
+2. B -> bB
+3. b -> LAMB 
+
+
+//These will print out each production set indexed by number in grammar definition.
+PREDICT:
+
+
+FIRST:
+
+
+FOLLOW:
