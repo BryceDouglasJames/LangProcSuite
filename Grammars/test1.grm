@@ -1,8 +1,8 @@
 // simple grammar ab*
 
-A -> aB#
+A -> aB
 B -> bB
-B -> LAMB 
+B ->  
 
 
 //These will print out each production set indexed by number in grammar definition.
